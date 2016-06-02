@@ -1,6 +1,12 @@
+require 'csv'
+
 class Database
-  def initialize
-    @data = {}
+  def initialize(path)
+    @data ||= load_database(path)
+  end
+
+  def load_database(path)
+    File.exist?(path) ? Hash[CSV.read(path)] : {}
   end
 
   def merge!(params)
