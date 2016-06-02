@@ -1,7 +1,7 @@
 require 'csv'
 
 class Database
-  attr_accessor :path
+  attr_accessor :path, :data
 
   def initialize(path)
     @path = path
@@ -13,13 +13,13 @@ class Database
   end
 
   def write(params)
-    @data.merge!(params)
+    data.merge!(params)
     File.open(path, 'a+') do |f|
       params.each { |key, value| f.puts("#{key}, #{value}") }
     end
   end
 
   def read(key)
-    @data.fetch(key)
+    data.fetch(key)
   end
 end
