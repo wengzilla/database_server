@@ -10,21 +10,17 @@ class DatabaseServerTest < MiniTest::Unit::TestCase
   end
 
   def setup
-    DatabaseServer.settings.db = Database.new
+    DatabaseServer.settings.db = Database.new('file.txt')
   end
 
   def test_set
-    Database.any_instance.expects(:merge!)
+    Database.any_instance.expects(:write).with({"key1" => "value1"})
     get '/set?key1=value1'
-  end
-
-  def test_set_body
-    get '/set?key2=value2'
     assert_equal 'OK', last_response.body
   end
 
   def test_get
-    get '/set?key3=value3'
+    Database.any_instance.expects(:read).with("key3").returns("value3")
     get '/get?key=key3'
     assert_equal 'value3', last_response.body
   end
@@ -33,6 +29,11 @@ class DatabaseServerTest < MiniTest::Unit::TestCase
     get '/get?key=key5'
     assert_equal 'Key not found', last_response.body
     assert_equal 404, last_response.status
+  end
+
+  def test_set_multiple_keys
+    Database.any_instance.expects(:write).with({"key1" => "value1", "key2" => "value2"})
+    get '/set?key1=value1&key2=value2'
   end
 
   def test_set_persists_across_requests

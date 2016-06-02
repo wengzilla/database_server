@@ -7,27 +7,16 @@ class DatabaseServer < Sinatra::Base
   end
 
   get '/set' do
-    write(params)
+    settings.db.write(params)
     [200, "OK"]
   end
 
   get '/get' do
     begin
-      read(params[:key])
+      settings.db.read(params[:key])
     rescue KeyError
       [404, ["Key not found"]]
     end
-  end
-
-  def write(params)
-    settings.db.merge!(params)
-    File.open('database.txt', 'a+') do |f|
-      params.each { |key, value| f.puts("#{key}, #{value}") }
-    end
-  end
-
-  def read(key)
-    settings.db.fetch(key)
   end
 
   run! if app_file == $0
